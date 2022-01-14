@@ -1,0 +1,35 @@
+https://fr.wikipedia.org/wiki/Recuit_simul%C3%A9
+
+
+On a une liste (sac de tuiles) l'index des tuiles déplacables
+
+et la liste s avec les tuiles dans leur ordre actuel (ca ressemble au sac mais y'a pas les @
+
+
+s0 = la liste tel qu'on la récupère
+
+s = s0 (notre état)
+g = s0 (le meilleur global)
+e = E(s) (énergie actuelle du système)
+m = e (copy)
+k = 0 (itération à laquelle on est)
+
+
+
+kmax = valeur abitraire (mnombre max d'itérations)
+emax = (0 ?) valeur arbitraire (l'énergie à partir de laquelle on se dit c'est bon on arrête)
+
+fonction E(s) = on calcule l'énergie du système en comptant le nombre de tuiles mal placées,
+c'est à dire : le nombre de jonctions pas legit.
+
+fonction voisin(s) = swap deux tuiles
+
+fontion aleatoire() = random entre [0, 1]
+
+fonction temp = 
+
+fonction P(delta_e, t) = return -exp(-delta_e / t)
+
+
+
+à la fin, on return s dans le fichier txt
