@@ -10,13 +10,48 @@ struct tile {
     char down;
 };
 
-unsigned int E(const std::vector<tile>& s)
+inline const int get_x_dim(const std::vector<tile>& s)
 {
-    unsigned int res = 0;
+    const int vector_size = s.size();
+
+    switch (vector_size)
+    {
+    case 4:
+        return 2;
+    case 9:
+        return 3;
+    case 16:
+        return 4;
+    case 25:
+        return 5;
+    case 36:
+        return 6;
+    
+    default:
+        exit(EXIT_FAILURE);
+    }
+}
+
+inline const unsigned int num_wrong_links(const std::vector<tile>& s, const unsigned int i)
+{
+    static const int x_dim = get_x_dim(s);
 
     
 
-    return res;
+    return 0;
+}
+
+unsigned int E(const std::vector<tile>& s)
+{
+    unsigned int energy = 0;
+
+    for (unsigned int i = 0; i < s.size(); ++i)
+    {
+        // Get current tile number of wrong links and add it to energy
+        energy += num_wrong_links(s, i);
+    }
+
+    return energy;
 }
 
 void find_best_tiles_setup(std::vector<tile>& tiles, std::vector<int>& moveableTilesIndexes)
