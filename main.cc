@@ -35,10 +35,43 @@ inline const int get_x_dim(const std::vector<tile>& s)
 inline const unsigned int num_wrong_links(const std::vector<tile>& s, const unsigned int i)
 {
     static const int x_dim = get_x_dim(s);
+    static const int last_row_first_index = x_dim * (x_dim - 1);
 
-    
+    unsigned int res = 0;
 
-    return 0;
+    // TODO speedup by not using if and adding a boolean directly
+
+    // If not on last row
+    if (!(i >= last_row_first_index))
+    {
+        // Get num_wrong_links with lower tile
+        res += s[i].down == s[i + x_dim].up;
+    }
+
+    // If not on last column
+    if (!(i % x_dim == x_dim - 1))
+    {
+        // Get num_wrong_links with right tile
+        res += s[i].right == s[i + 1].left;
+    }
+
+    /* We do not use those 2 since we iterate on every tiles, links would be counted 2 times
+    // If not en first column
+    if (!(i % x_dim == 0))
+    {
+        // Get num_wrong_links with left tile
+        res += s[i].left == s[i - 1].right;
+    }
+
+
+    // If not on first row
+    if (!(i < x_dim))
+    {
+        // Get num_wrong_links with upper tile
+        res += s[i].up == s[i - x_dim].down;
+    }
+    */
+    return res;
 }
 
 unsigned int E(const std::vector<tile>& s)
