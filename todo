@@ -1,6 +1,12 @@
 https://fr.wikipedia.org/wiki/Recuit_simul%C3%A9
 
 
+################################################################################################
+/!!!!!\ On a laissé ça la pour le rapport mais en vrai faut juste faire la fonction temp /!!!!!\
+################################################################################################
+
+
+
 On a une liste (sac de tuiles) l'index des tuiles déplacables
 
 et la liste s avec les tuiles dans leur ordre actuel (ca ressemble au sac mais y'a pas les @
