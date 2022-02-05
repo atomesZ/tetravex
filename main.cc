@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <math.h>
 
 struct tile {
     char up;
@@ -12,7 +13,7 @@ struct tile {
     char down;
 };
 
-inline const int get_x_dim(const std::vector<tile>& s)
+inline int get_x_dim(const std::vector<tile>& s)
 {
     const int vector_size = s.size();
 
@@ -28,13 +29,13 @@ inline const int get_x_dim(const std::vector<tile>& s)
         return 5;
     case 36:
         return 6;
-    
+
     default:
         exit(EXIT_FAILURE);
     }
 }
 
-inline const unsigned int num_wrong_links(const std::vector<tile>& s, const unsigned int i)
+inline unsigned int num_wrong_links(const std::vector<tile>& s, const unsigned int i)
 {
     static const int x_dim = get_x_dim(s);
 
@@ -59,7 +60,7 @@ inline const unsigned int num_wrong_links(const std::vector<tile>& s, const unsi
         res += s[i].right != s[i + 1].left;
     }
     */
-    
+
     // If not en first column
     if (!(i % x_dim == 0))
     {
@@ -73,7 +74,7 @@ inline const unsigned int num_wrong_links(const std::vector<tile>& s, const unsi
         // Get num_wrong_links with upper tile
         res += s[i].up != s[i - x_dim].down;
     }
-    
+
     return res;
 }
 
@@ -90,7 +91,7 @@ unsigned int E(const std::vector<tile>& s)
     return energy;
 }
 
-const std::vector<tile> voisin(const std::vector<tile>& s0, const std::vector<int>& moveableTilesIndexes)
+std::vector<tile> voisin(const std::vector<tile>& s0, const std::vector<int>& moveableTilesIndexes)
 {
     std::vector<int> out;
     std::sample(
@@ -104,8 +105,38 @@ const std::vector<tile> voisin(const std::vector<tile>& s0, const std::vector<in
     std::vector<tile> res = s0;
 
     std::swap(res[out[0]], res[out[1]]);
-    
+
     return res;
+}
+
+inline double P(const int delta_e, const double t)
+{
+    return exp(-(double)delta_e / t);
+}
+
+// FIXME fix the temp function (rework everything to make it better)
+inline double temp(const int energy)
+{
+    static double temperature = 1000.0;
+    static int old_energy = energy;
+    static int times_stuck_at_old_energy = 0;
+
+    if (old_energy == energy)
+    {
+        ++times_stuck_at_old_energy;
+
+        if (times_stuck_at_old_energy >= 100)
+            temperature = 10.0;
+    }
+    else
+    {
+        times_stuck_at_old_energy = 0;
+        old_energy = energy;
+    }
+
+    temperature *= 0.99;
+
+    return temperature;
 }
 
 std::vector<tile> find_best_tiles_setup(std::vector<tile>& s0, const std::vector<int>& moveableTilesIndexes)
@@ -113,29 +144,34 @@ std::vector<tile> find_best_tiles_setup(std::vector<tile>& s0, const std::vector
     std::vector<tile> s = s0;
     std::vector<tile> g = s0;
 
-    unsigned int e = E(s);
-    unsigned int m = e;
+    int e = E(s);
+
+    if (e == 0)
+        return s;
+
+    int m = e;
     unsigned int k = 0;
 
 
     while (true)
     {
+        std::cout << e << std::endl;
         const std::vector<tile> sn = voisin(s, moveableTilesIndexes);
-        const unsigned int en = E(sn);
+        const int en = E(sn);
 
-        if (en < e || (float) rand()/RAND_MAX < 0)//P(en -e, temp(k/kmax)))
+        if (en < e || (float) rand()/RAND_MAX < P(en - e, temp(e)))
         {
             s = sn;
             e = en;
         }
-        
+
         if (e < m)
         {
+            if (e == 0)
+                return s;
+
             g = s;
             m = e;
-
-            if (e == 0)
-                return g;
         }
 
         ++k;
@@ -170,7 +206,7 @@ int main(int argc, char** argv)
         // Add tile to moveables
         if (line.find('@') == std::string::npos)
             moveableTilesIndexes.push_back(i_tile);
-        
+
         ++i_tile;
     }
 
@@ -178,13 +214,9 @@ int main(int argc, char** argv)
     tiles = find_best_tiles_setup(tiles, moveableTilesIndexes);
 
     // Flush new tiles to output file
-    std::vector<tile>::iterator it = tiles.begin();
-    outputFile << (*it).up << (*it).left << (*it).right << (*it).down;
-    ++it;
-
-    for (; it != tiles.end(); ++it)
+    for (std::vector<tile>::iterator it = tiles.begin(); it != tiles.end(); ++it)
     {
-        outputFile << "\n" << (*it).up << (*it).left << (*it).right << (*it).down;
+        outputFile << (*it).up << (*it).left << (*it).right << (*it).down << "\n";
     }
 
     // Close files
