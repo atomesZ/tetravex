@@ -117,8 +117,8 @@ inline double P(const int delta_e, const double t)
 // FIXME fix the temp function (rework everything to make it better)
 inline double temp(const int energy)
 {
-    static const int threshold_times_stuck_at_old_energy = 10000;
-    const double init_temperature = 1.0;
+    static const int threshold_times_stuck_at_old_energy = 10000; // i = 10000
+    const double init_temperature = 1.0; // T_0 = 1
     static double temperature = init_temperature;
     static int old_energy = energy;
     static int times_stuck_at_old_energy = 0;
@@ -128,7 +128,7 @@ inline double temp(const int energy)
         ++times_stuck_at_old_energy;
 
         if (times_stuck_at_old_energy >= threshold_times_stuck_at_old_energy)
-            temperature = init_temperature;
+            temperature = init_temperature; // T_x
     }
     else
     {
@@ -136,9 +136,11 @@ inline double temp(const int energy)
         old_energy = energy;
     }
 
-    temperature *= 0.99999;
+    temperature *= 0.9999; // λ = 0.9999
 
+    // Use this if you test with the test notebook
     std::cout << temperature << ",";
+    std::cerr << energy << ",";
 
     return temperature;
 }
