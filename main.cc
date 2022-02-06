@@ -41,27 +41,7 @@ inline unsigned int num_wrong_links(const std::vector<tile>& s, const unsigned i
 
     unsigned int res = 0;
 
-    // TODO speedup by not using if and adding a boolean directly
-
-    /* We do not use those 2 since we iterate on every tiles, links would be counted 2 times
-    static const int last_row_first_index = x_dim * (x_dim - 1);
-
-    // If not on last row
-    if (!(i >= last_row_first_index))
-    {
-        // Get num_wrong_links with lower tile
-        res += s[i].down != s[i + x_dim].up;
-    }
-
-    // If not on last column
-    if (!(i % x_dim == x_dim - 1))
-    {
-        // Get num_wrong_links with right tile
-        res += s[i].right != s[i + 1].left;
-    }
-    */
-
-    // If not en first column
+    // If not on first column
     if (!(i % x_dim == 0))
     {
         // Get num_wrong_links with left tile
@@ -114,7 +94,6 @@ inline double P(const int delta_e, const double t)
     return exp(-(double)delta_e / t);
 }
 
-// FIXME fix the temp function (rework everything to make it better)
 inline double temp(const int energy)
 {
     static const int threshold_times_stuck_at_old_energy = 10000; // i = 10000
@@ -138,20 +117,18 @@ inline double temp(const int energy)
 
     temperature *= 0.9999; // λ = 0.9999
 
-    // Use this if you test with the test notebook
-    std::cout << temperature << ",";
-    std::cerr << energy << ",";
-
     return temperature;
 }
 
 std::vector<tile> find_best_tiles_setup(std::vector<tile>& s0, const std::vector<int>& moveableTilesIndexes)
 {
+    // The variable naming here has been done according to https://fr.wikipedia.org/wiki/Recuit_simul%C3%A9
     std::vector<tile> s = s0;
     std::vector<tile> g = s0;
 
     int e = E(s);
 
+    // If the problem is already solved
     if (e == 0)
         return s;
 
@@ -162,12 +139,14 @@ std::vector<tile> find_best_tiles_setup(std::vector<tile>& s0, const std::vector
         const std::vector<tile> sn = voisin(s, moveableTilesIndexes);
         const int en = E(sn);
 
+        // Accept the modifications if energy is better or according to a certain probability
         if (en < e || (float) rand()/RAND_MAX < P(en - e, temp(e)))
         {
             s = sn;
             e = en;
         }
 
+        // Update best state found
         if (e < m)
         {
             if (e == 0)
